@@ -1,6 +1,7 @@
 import cmd
 import threading
-
+#This file doesn't attribute to the assignment
+#It just shows how basic CLI work
 class ServerShell(cmd.Cmd):
     intro = 'Welcome to the server shell. Type help or ? to list commands.\n'
     prompt = '(server) '
