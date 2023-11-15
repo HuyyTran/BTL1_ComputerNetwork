@@ -14,15 +14,7 @@ class ClientShell(cmd.Cmd):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((self.server_ip, self.server_port))
     
-    def do_discover(self, hostname):
-        "Discover files shared by a host: DISCOVER <hostname>"
-        command = {"action": "discover", "hostname": hostname}
-        self.send_command(command)
-    
-    def do_ping(self, hostname):
-        "Check if a host is active: PING <hostname>"
-        command = {"action": "ping", "hostname": hostname}
-        self.send_command(command)
+   
     
     def do_exit(self, arg):
         "Exit the client shell"
