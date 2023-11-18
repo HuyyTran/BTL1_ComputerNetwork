@@ -72,8 +72,7 @@ class ClientShell(cmd.Cmd):
             return response
         except Exception as e:
             print(f"An error occurred: {e}")
-
-    # This function handle the p2p fetching activity
+    
     def send_command2(self, socket, command):
         try:
             # Send command
@@ -83,7 +82,7 @@ class ClientShell(cmd.Cmd):
             # Receive file
             path = input("Enter the directory for your new downloaded file: ")
             filename = input("Enter the name of your new downloaded file: ")
-            filepath = path + filename +".txt"
+            filepath = path + filename + ".txt"
             with open(filepath, 'wb') as file:
                 data = socket.recv(2048)
                 file.write(data)
@@ -92,7 +91,6 @@ class ClientShell(cmd.Cmd):
             print(f"An error occurred: {e}")
             
         
-
 #------------------------------------------------------------------SERVER SIDE--------------------------------------------------------------#
 # This class will run parralel with the ClientShell
 # But do not print anything, just handle implicitly
