@@ -3,11 +3,9 @@ import cmd
 from ipaddress import ip_address
 import threading
 import socket
-import json
-import os
-import shutil
 
 dictionary = "D:/dictionary.txt"
+event = threading.Event()
 #------------------------------------------------CLIENT SIDE---------------------------------------------------------------------------------#
 class ClientShell(cmd.Cmd):
     intro = 'Welcome to the P2P client shell. Type help or ? to list commands.\n'
@@ -27,43 +25,19 @@ class ClientShell(cmd.Cmd):
         self.sock.close()
         return True  # Return True to stop the cmd loop and exit
 
-    # This function return the response from the server
-    def send_command(socket, command):
-        try:
-            # Send command
-            message = json.dumps(command).encode('utf-8')
-            socket.sendall(message)
-
-            # Wait for the server's response
-            response = socket.recv(4096).decode('utf-8')
-            print(f"Server response: ")
-            print(response)
-            return response
-        except Exception as e:
-            print(f"An error occurred: {e}")
-    
     def do_publish(self, arg):
-        "Inform the server of an existing file"
+        "Inform the server of an existing file\n FORMAT: publish lname fname"
         lname, fname = arg.split(' ')
         filepath = input("Enter the path of the file: ")
         with open(dictionary, 'a') as file:
             # We have to protect this field cause this is a write-file action
             with self.lock:
-                file.write(f"<{fname}> <{filepath}>\n")
+                file.write(f"<'{fname}'> <'{filepath}'>\n")
             command = f"publish '{lname}' '{fname}'"
             self.send_command(self.sock, command)
     
-    def receive_file(socket, file_name):
-        with open(file_name, 'wb') as file:
-            while True:
-                data = socket.recv(1024)
-                if not data:
-                    break
-                file.write(data)
-
-
     def do_fetch(self, fname):
-        "Request the information of nodes holding specific file from the server"
+        "Request the information of nodes holding specific file from the server\n FORMAT: fetch filename"
         command = f"fetch '{fname}'"
         response = self.send_command(self.sock, command)
         lines = response.split("\n")
@@ -73,19 +47,50 @@ class ClientShell(cmd.Cmd):
             
             # Get ip_addr and port of the target node
             ip_address = (values[0])
-            port = (values[1])
+            port = (int)(values[1])
             
             # Establish connection
             p2p_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            p2p_sock.connect((ip_address, port))
+            p2p_sock.connect((ip_address, 30))
 
             # Send request again
-            self.send_command(p2p_sock, command)
-            
-            # Receive file
-            self.receive_file(p2p_sock, f"D:/'{fname}'")
+            self.send_command2(p2p_sock, command)
 
             break
+        
+    # This function return the response from the server
+    def send_command(self, socket, command):
+        try:
+            # Send command
+            message = command.encode('utf-8')
+            socket.sendall(message)
+
+            # Wait for the server's response
+            response = socket.recv(4096).decode('utf-8')
+            print(f"Server response: ")
+            print(response)
+            return response
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
+    # This function handle the p2p fetching activity
+    def send_command2(self, socket, command):
+        try:
+            # Send command
+            message = command.encode('utf-8')
+            socket.sendall(message)    
+     
+            # Receive file
+            path = input("Enter the directory for your new downloaded file: ")
+            filename = input("Enter the name of your new downloaded file: ")
+            filepath = path + filename +".txt"
+            with open(filepath, 'wb') as file:
+                data = socket.recv(2048)
+                file.write(data)
+            event.set()
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            
         
 
 #------------------------------------------------------------------SERVER SIDE--------------------------------------------------------------#
@@ -97,6 +102,7 @@ class Server():
         self.server_host = host
         self.server_port = port
         self.server_socket = None
+        self.clients = {}  # Dictionary to store client address and socket object
         self.clients_lock = threading.Lock()  # A lock to protect shared resources
 
     def start_server(self):
@@ -135,21 +141,25 @@ class Server():
     
     def send_file(self, socket, file_path):
         with open(file_path, 'rb') as file:
-            data = file.read(1024)
+            flag = 0
+            data = file.read(2048)
             while data:
-                socket.sendall(data)
-                data = file.read(1024)
-      
+                socket.send(data)
+                flag = 1
+                data = file.read(2048)
+        if (flag == 1):
+                event.wait()    
+                print(f"A file ({file_path}) has been requested by someone")
+                
     def fetch_file(self, socket, fname):
         with open(dictionary, 'r') as file:
             for line in file:
                 # Extract values within angle brackets
                 # Remove the '<' at the beginning and Remove the '>' at the end
                 values = [value.strip(" <>") for value in line.split()]
-                
                 current_fname = values[0]
-                filepath = values[1]
-                if current_fname == fname:
+                filepath = " ".join(values[1:]).strip("'")
+                if (current_fname == fname):
                     self.send_file(socket, filepath)
                     break
     
@@ -157,7 +167,7 @@ class Server():
 #-----------------------------------------------------------------EXECUTE CODE------------------------------------------------------------------------------#
 def run_Server():
     host = 'localhost'  # Change to the appropriate interface
-    port = 5000  # Change to the appropriate port
+    port = 30  # Change to the appropriate port
     server = Server(host, port)
     server.start_server()
     
