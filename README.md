@@ -35,13 +35,13 @@ Exiting client...
 ### Publish
 - **Command**: `publish`
 - **Syntax**: `publish <lname> <fname>`
-- **Description**: Inform the server of a new file that you want to share.
+- **Description**: Inform the server of a new file named 'fname' that you want to share. After sending the command to the server, you will be asked to provide a filepath. Please enter an authentic path. Afterward, your file will be known as 'fname' file by the server and other clients who want to fetch your file.
 - **Parameters**:
 - `<lname>`: The local path where the file is stored on your system.
 - `<fname>`: The name you want to give the file in the network.
 - **Example**:
 
-(client) publish D:/shared myphoto.jpg
+(client) publish myphoto.jpg myphoto
 
 Enter the path of the file: D:/shared/myphoto.jpg
 
@@ -50,16 +50,16 @@ Enter the path of the file: D:/shared/myphoto.jpg
 - **Syntax**: `fetch <filename>`
 - **Description**: Requests information from the server about nodes that hold a specific file.
 - **Parameters**:
-- `<filename>`: The name of the file you want to download.
+- `<filename>`: The name of the file you want to download. Please don't forget to add the type of your file at the end.
 - **Example**:
   
-(client) fetch myphoto.jpg
+(client) fetch myphoto
 
 Enter the directory for your new downloaded file: D:/downloads/
 
-Enter the name of your new downloaded file: newphoto
+Enter the name of your new downloaded file(Don't forget to add the type of your file): newphoto.jpg
 
-The file 'newphoto' has been downloaded to your device (path: 'D:/downloads/newphoto.txt').
+The file 'newphoto.jpg' has been downloaded to your device (path: 'D:/downloads/newphoto.jpg').
 
 
 ## Server Commands
