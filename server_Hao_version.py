@@ -1,7 +1,6 @@
 import cmd
 import threading
 import socket
-import json
 
 dictionary = "D:/dictionary_s.txt"
 class ServerCmd(cmd.Cmd):
@@ -33,6 +32,7 @@ class ServerCmd(cmd.Cmd):
             threading.Thread(target=self.handle_client, args=(client_conn, client_addr), daemon=True).start()
 
 
+
     def handle_client(self, client_conn, client_addr):
         while True:
             try:
@@ -60,15 +60,14 @@ class ServerCmd(cmd.Cmd):
                             ip = values[0].strip("'")
                             port = values[1].strip("'")
                             fname = " ".join(values[2:]).strip("'")
-                            print (ip + port + fname)
-                            print(command[1])
                             if (fname == command[1].strip("'")):                               
                                 response = f"<{ip}> <{port}>"
                                 flag = 1
                                 break
-                if (flag == 1):
-                    message = response.encode('utf-8')
-                    client_conn.sendall(message)
+                        if (flag == 0):
+                            response = "2 Error"
+                message = response.encode('utf-8')
+                client_conn.sendall(message)
                 # Handle different commands here (not shown for brevity)
             except ConnectionResetError:
                 break
