@@ -18,7 +18,7 @@ class ClientShell(cmd.Cmd):
         self.server_port = 5000       # Replace with actual server port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((self.server_ip, self.server_port))
-    
+          
     def do_exit(self, arg):
         "Exit the client shell"
         print("Exiting client...")
@@ -40,6 +40,14 @@ class ClientShell(cmd.Cmd):
         "Request the information of nodes holding specific file from the server\n FORMAT: fetch filename"
         command = f"fetch '{fname}'"
         response = self.send_command(self.sock, command)
+        if (response == "1 OK"):
+            print("Your file's information has been downloading online.")
+        elif (response == "2 Error"):
+            print(f"There is no requested file '{fname}' existed in the network.")
+            return
+        elif (response == "3 Error"):
+            print(f"There is no clients who is holding your requested file '{fname}' be online. Please try again later.")
+            return
         lines = response.split("\n")
         for line in lines:
             # Extract values within angle brackets
@@ -73,6 +81,7 @@ class ClientShell(cmd.Cmd):
         except Exception as e:
             print(f"An error occurred: {e}")
     
+    # This function is to handle p2p transfer file
     def send_command2(self, socket, command):
         try:
             # Send command
@@ -86,7 +95,7 @@ class ClientShell(cmd.Cmd):
             with open(filepath, 'wb') as file:
                 data = socket.recv(2048)
                 file.write(data)
-            event.set()
+            print(f"The file '{filename}' has been downloaded to your device (path: '{filepath}').")
         except Exception as e:
             print(f"An error occurred: {e}")
             
@@ -94,7 +103,7 @@ class ClientShell(cmd.Cmd):
 #------------------------------------------------------------------SERVER SIDE--------------------------------------------------------------#
 # This class will run parralel with the ClientShell
 # But do not print anything, just handle implicitly
-class Server():
+class P2P_Server():
     def __init__(self, host, port):
         super().__init__()
         self.server_host = host
@@ -139,15 +148,11 @@ class Server():
     
     def send_file(self, socket, file_path):
         with open(file_path, 'rb') as file:
-            flag = 0
             data = file.read(2048)
             while data:
                 socket.send(data)
-                flag = 1
                 data = file.read(2048)
-        if (flag == 1):
-                event.wait()    
-                print(f"A file ({file_path}) has been requested by someone")
+        
                 
     def fetch_file(self, socket, fname):
         with open(dictionary, 'r') as file:
@@ -166,7 +171,7 @@ class Server():
 def run_Server():
     host = 'localhost'  # Change to the appropriate interface
     port = 30  # Change to the appropriate port
-    server = Server(host, port)
+    server = P2P_Server(host, port)
     server.start_server()
     
 
@@ -178,6 +183,7 @@ if __name__ == '__main__':
     # Create threads for the server and client functions
     ClientShell_thread = threading.Thread(target=run_ClientShell)
     Server_thread = threading.Thread(target=run_Server)
+    #threading.Thread(target=receive_heartbeat).start()
     
     # Start both threads
     ClientShell_thread.start()
