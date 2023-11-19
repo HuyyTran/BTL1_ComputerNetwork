@@ -3,6 +3,7 @@ import threading
 import socket
 import json
 
+dictionary = "D:/dictionary_s.txt"
 class ServerCmd(cmd.Cmd):
     intro = 'Welcome to the P2P server shell. Type help or ? to list commands.\n'
     prompt = '(server) '
@@ -31,12 +32,43 @@ class ServerCmd(cmd.Cmd):
             print(f"New client connected: {client_addr}")
             threading.Thread(target=self.handle_client, args=(client_conn, client_addr), daemon=True).start()
 
+
     def handle_client(self, client_conn, client_addr):
         while True:
             try:
-                data = client_conn.recv(1024)
+                data = client_conn.recv(1024).decode('utf-8')
                 if not data:
                     break
+                print(f"Client ({client_addr}): " + data + "\n")
+                host, port = client_addr
+                command = data.strip().split(' ')
+                flag = 0
+                # Handle 'publish' command from client
+                # Remind syntax: publish lname fname
+                if (command[0] == "publish"):
+                    with open(dictionary, 'a') as file:
+                        with self.clients_lock:
+                            file.write(f"<'{host}'> <'{port}'> <'{command[2]}'>\n")
+                    flag = 1
+                    response = "1 OK"
+                elif (command[0] == "fetch"):
+                    print("fetching...")
+                    # Loop the dictionary to find fname and its corespoding hostname
+                    with open(dictionary, 'r') as file:
+                        for line in file:
+                            values = [value.strip(" <>") for value in line.split()]
+                            ip = values[0].strip("'")
+                            port = values[1].strip("'")
+                            fname = " ".join(values[2:]).strip("'")
+                            print (ip + port + fname)
+                            print(command[1])
+                            if (fname == command[1].strip("'")):                               
+                                response = f"<{ip}> <{port}>"
+                                flag = 1
+                                break
+                if (flag == 1):
+                    message = response.encode('utf-8')
+                    client_conn.sendall(message)
                 # Handle different commands here (not shown for brevity)
             except ConnectionResetError:
                 break
@@ -48,15 +80,58 @@ class ServerCmd(cmd.Cmd):
         print(f"Client {client_addr} has disconnected")
         client_conn.close()
 
-    def do_discover(self, hostname):
-        "Discover the list of local files of the host named hostname"
-        # Use the ping command to check if the hostname exists and is connected
-        if self.do_ping(hostname, check_mode=True):  # Added check_mode parameter to ping method
-            # If the client is active, proceed to list the shared files
-            client_files = self.clients[hostname]['files']
-            print(f"Files shared by {hostname}: {client_files}")
-        else:
-            print(f"Hostname {hostname} is not active or does not exist.")
+    # def do_discover(self, hostname):
+    #     "Discover the list of local files of the host named hostname"
+    #     # Use the ping command to check if the hostname exists and is connected
+    #     if self.do_ping(hostname, check_mode=True):  # Added check_mode parameter to ping method
+    #         # If the client is active, proceed to list the shared files
+    #         client_files = self.clients[hostname]['files']
+    #         print(f"Files shared by {hostname}: {client_files}")
+    #     else:
+    #         print(f"Hostname {hostname} is not active or does not exist.")
+    
+    def parse_dictionary_s(self,contents):
+        files_dictionary = {}
+        lines = contents.strip().splitlines()
+        for line in lines:
+        # Remove the angle brackets and extra single quotes
+            parts = line.translate(str.maketrans('', '', "<>'")).split()
+            if len(parts) == 3:
+                address, port, file_name = parts
+                port = int(port)  # Convert the port to an integer
+                key = (address, port)
+                if key not in files_dictionary:
+                    files_dictionary[key] = []
+                files_dictionary[key].append(file_name)
+        return files_dictionary
+
+    def load_shared_files_dictionary(self):
+        # Load and parse the contents of dictionary_s.txt
+        with open('D:/dictionary_s.txt', 'r') as file:
+            contents = file.read()
+        return self.parse_dictionary_s(contents)
+    
+    def do_discover(self, arg):
+        "Discover the list of local files of the host named by address and port"
+        # Load the shared files from the dictionary
+        files_dictionary = self.load_shared_files_dictionary()
+        
+        # Parse the argument to get the address and port
+        try:
+            address, port_str = arg.split(',')
+            port = int(port_str)
+            client_key = (address, port)
+            
+            # Find the files shared by the specified client
+            if client_key in files_dictionary:
+                files_list = files_dictionary[client_key]
+                print(f"Files shared by {client_key}: {files_list}")
+            else:
+                print(f"No files shared by {client_key} or client not connected.")
+        except ValueError:
+            print(f"Incorrect format for discover command. Expected format: discover <address>,<port>")
+
+    
     
     def do_ping(self, arg, check_mode=False):
         "Check if a host is active: PING <hostname>"
