@@ -5,3 +5,4 @@
 
 - Để chạy code chỉ cần quan tâm 2 file: client_real và server_real. Tất cả các file khác là các file phụ trợ trong quá trình làm bài và không cần include trong report lúc nộp bài
 - Cần làm một bản Manual guide để hướng dẫn cụ thể cú pháp của các key function, và tuần tự quy trình sử dụng code
+# Hướng dẫn sử dụng:
