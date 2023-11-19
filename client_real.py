@@ -90,11 +90,14 @@ class ClientShell(cmd.Cmd):
      
             # Receive file
             path = input("Enter the directory for your new downloaded file: ")
-            filename = input("Enter the name of your new downloaded file: ")
-            filepath = path + filename + ".txt"
+            filename = input("Enter the name of your new downloaded file(Don't forget to add the type of your file): ")
+            filepath = path + filename
             with open(filepath, 'wb') as file:
-                data = socket.recv(2048)
-                file.write(data)
+                while True:
+                    data = socket.recv(256)
+                    if not data:
+                        break
+                    file.write(data)
             print(f"The file '{filename}' has been downloaded to your device (path: '{filepath}').")
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -148,10 +151,14 @@ class P2P_Server():
     
     def send_file(self, socket, file_path):
         with open(file_path, 'rb') as file:
-            data = file.read(2048)
-            while data:
-                socket.send(data)
-                data = file.read(2048)
+            while True:
+                data = file.read(256)
+                if not data:
+                    break
+                socket.sendall(data)
+        # Signal the end of file transmission
+        socket.shutdown(socket.SHUT_WR)
+
         
                 
     def fetch_file(self, socket, fname):
