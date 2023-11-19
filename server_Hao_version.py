@@ -59,13 +59,19 @@ class ServerCmd(cmd.Cmd):
                             values = [value.strip(" <>") for value in line.split()]
                             ip = values[0].strip("'")
                             port = values[1].strip("'")
+                            hostname = ip + "," + port
                             fname = " ".join(values[2:]).strip("'")
-                            if (fname == command[1].strip("'")):                               
-                                response = f"<{ip}> <{port}>"
-                                flag = 1
-                                break
+                            if (fname == command[1].strip("'")):
+                                if (self.do_ping(hostname, check_mode=True)):                               
+                                    response = f"<{ip}> <{port}>"
+                                    flag = 1
+                                    break
+                                else:
+                                    flag = 2  
                         if (flag == 0):
                             response = "2 Error"
+                        elif(flag == 2):
+                            response = "3 Error"
                 message = response.encode('utf-8')
                 client_conn.sendall(message)
                 # Handle different commands here (not shown for brevity)
@@ -90,7 +96,7 @@ class ServerCmd(cmd.Cmd):
             print(f"Hostname {hostname} is not active or does not exist.")
     
     def do_ping(self, arg, check_mode=False):
-        "Check if a host is active: PING <hostname>"
+        "Check if a host is active: PING <IP address>,<Port>"
         try:
             # Split the argument by comma and strip any whitespace
             hostname, port_str = arg.split(',')
