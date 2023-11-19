@@ -6,7 +6,7 @@
 - Để chạy code chỉ cần quan tâm 2 file: client_real và server_real. Tất cả các file khác là các file phụ trợ trong quá trình làm bài và không cần include trong report lúc nộp bài
 
 
-#Problems
+# Problems
 - Hiện tại chỉ transfer được file .txt, cần phải nghĩ ra cách để transfer các file tầm trung như .jpg, hoặc các file video
   
 # P2P File-Sharing Application User Manual
