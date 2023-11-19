@@ -1,7 +1,6 @@
 import cmd
 import threading
 import socket
-import json
 
 dictionary = "D:/dictionary_s.txt"
 class ServerCmd(cmd.Cmd):
@@ -15,6 +14,7 @@ class ServerCmd(cmd.Cmd):
         self.server_socket = None
         self.clients = {}  # Dictionary to store client address and socket object
         self.clients_lock = threading.Lock()  # A lock to protect shared resources
+        self.shutdown_flag = threading.Event()  # Flag to control the shutdown
 
     def start_server(self):
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -22,15 +22,28 @@ class ServerCmd(cmd.Cmd):
         self.server_socket.bind((self.server_host, self.server_port))
         self.server_socket.listen()
         print(f"Server listening on {self.server_host}:{self.server_port}")
+        self.shutdown_flag.clear()  # Ensure the flag is cleared when starting
         threading.Thread(target=self.listen_to_clients, daemon=True).start()
 
     def listen_to_clients(self):
-        while True:
-            client_conn, client_addr = self.server_socket.accept()
-            with self.clients_lock:
-                self.clients[client_addr] = client_conn
-            print(f"New client connected: {client_addr}")
-            threading.Thread(target=self.handle_client, args=(client_conn, client_addr), daemon=True).start()
+        while not self.shutdown_flag.is_set():  # Continue to listen unless a shutdown is signaled
+            try:
+                client_conn, client_addr = self.server_socket.accept()
+                with self.clients_lock:
+                    self.clients[client_addr] = client_conn
+                print(f"New client connected: {client_addr}")
+                # Handle the client in a new thread
+                client_thread = threading.Thread(target=self.handle_client, args=(client_conn, client_addr), daemon=True)
+                client_thread.start()
+            except socket.error as e:
+                # If the shutdown flag is set, we expect this exception as the server is closing the socket
+                if self.shutdown_flag.is_set():
+                    print("Server is shutting down.")
+                    break
+                else:
+                    # An actual unexpected socket error
+                    print(f"Socket error: {e}")
+
 
 
     def handle_client(self, client_conn, client_addr):
@@ -59,16 +72,21 @@ class ServerCmd(cmd.Cmd):
                             values = [value.strip(" <>") for value in line.split()]
                             ip = values[0].strip("'")
                             port = values[1].strip("'")
+                            hostname = ip + "," + port
                             fname = " ".join(values[2:]).strip("'")
-                            print (ip + port + fname)
-                            print(command[1])
-                            if (fname == command[1].strip("'")):                               
-                                response = f"<{ip}> <{port}>"
-                                flag = 1
-                                break
-                if (flag == 1):
-                    message = response.encode('utf-8')
-                    client_conn.sendall(message)
+                            if (fname == command[1].strip("'")):
+                                if (self.do_ping(hostname, check_mode=True)):                               
+                                    response = f"<{ip}> <{port}>"
+                                    flag = 1
+                                    break
+                                else:
+                                    flag = 2  
+                        if (flag == 0):
+                            response = "2 Error"
+                        elif(flag == 2):
+                            response = "3 Error"
+                message = response.encode('utf-8')
+                client_conn.sendall(message)
                 # Handle different commands here (not shown for brevity)
             except ConnectionResetError:
                 break
@@ -115,28 +133,34 @@ class ServerCmd(cmd.Cmd):
         "Discover the list of local files of the host named by address and port"
         # Load the shared files from the dictionary
         files_dictionary = self.load_shared_files_dictionary()
-        
+    
         # Parse the argument to get the address and port
         try:
             address, port_str = arg.split(',')
             port = int(port_str)
             client_key = (address, port)
-            
-            # Find the files shared by the specified client
-            if client_key in files_dictionary:
-                files_list = files_dictionary[client_key]
-                print(f"Files shared by {client_key}: {files_list}")
+        
+            # Check if the host is active using the same logic as in do_ping
+            is_active = self.do_ping(arg, check_mode=True)
+        
+            # If the host is active, find and display the files shared by the specified client
+            if is_active:
+                if client_key in files_dictionary:
+                    files_list = files_dictionary[client_key]
+                    print(f"Files shared by {client_key}: {files_list}")
+                else:
+                    print(f"Host {client_key} is active but not sharing any files.")
             else:
-                print(f"No files shared by {client_key} or client not connected.")
+                print(f"Host {client_key} is not active or does not exist.")
         except ValueError:
             print(f"Incorrect format for discover command. Expected format: discover <address>,<port>")
+
 
     
     
     def do_ping(self, arg, check_mode=False):
         "Check if a host is active: PING <hostname>"
         try:
-            # Split the argument by comma and strip any whitespace
             hostname, port_str = arg.split(',')
             hostname = hostname.strip()
             port = int(port_str.strip())  # Convert the port to an integer
@@ -147,31 +171,44 @@ class ServerCmd(cmd.Cmd):
             # Lock the clients dictionary to check if the client is active
             with self.clients_lock:
                 is_active = any(client_addr[0] == client_to_check[0] and client_addr[1] == client_to_check[1] for client_addr in self.clients)
-            
+
             if check_mode:
                 # When called from within another method, return the result instead of printing it
                 return is_active
-                
-            else:
-                # Regular ping behavior, print the result
-                status = "active" if is_active else "inactive"
-                print(f"Client {client_to_check} is {status}")
-                # return is_active    
-        except ValueError:
-            print("Invalid input. Correct format: ping <ip>,<port>")
-        except Exception as e:
-            print(f"An unexpected error occurred: {e}")
+            
+            # Regular ping behavior, print the result
+            status = "active" if is_active else "inactive"
+            print(f"Client {client_to_check} is {status}")
 
+        except ValueError:
+            if not check_mode:
+                print("Invalid input. Correct format: ping <ip>,<port>")
+            return False  # If there's an error in the input format, return False for check_mode
+        except Exception as e:
+            if not check_mode:
+                print(f"An unexpected error occurred: {e}")
+            return False  # If any other exception occurred, return False for check_mode
+
+
+    # if you want the whole system to shut down, remember to exit all the clients first,
+    # or else the server will not really shut down even you command "exit"
+    
     def do_exit(self, arg):
         "Exit the server shell and shut down the server."
         print("Shutting down server...")
+        self.shutdown_flag.set()  # Set the shutdown flag
         if self.server_socket:
             self.server_socket.close()
+        # Wait for all client threads to finish
+        for thread in threading.enumerate():
+            if thread is not threading.current_thread():  # Don't join the current thread
+                thread.join()
         with self.clients_lock:
             for client_conn in self.clients.values():
                 client_conn.close()
             self.clients.clear()
         return True  # Stop the cmd loop
+    
     def do_listclients(self, arg):
         "List all connected clients."
         with self.clients_lock:
