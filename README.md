@@ -27,6 +27,7 @@ Here is a list of commands that you can use within the client CLI:
 - **Example**:
   
 (client) exit
+
 Exiting client...
 
 ### Publish
@@ -39,6 +40,7 @@ Exiting client...
 - **Example**:
 
 (client) publish D:/shared myphoto.jpg
+
 Enter the path of the file: D:/shared/myphoto.jpg
 
 ### Fetch
@@ -48,9 +50,13 @@ Enter the path of the file: D:/shared/myphoto.jpg
 - **Parameters**:
 - `<filename>`: The name of the file you want to download.
 - **Example**:
+  
 (client) fetch myphoto.jpg
+
 Enter the directory for your new downloaded file: D:/downloads/
+
 Enter the name of your new downloaded file: newphoto
+
 The file 'newphoto' has been downloaded to your device (path: 'D:/downloads/newphoto.txt').
 
 
@@ -64,6 +70,7 @@ The server operates in the background and does not require interactive commands 
 - **Example**:
   
 (server) exit
+
 Shutting down server...
 
 
