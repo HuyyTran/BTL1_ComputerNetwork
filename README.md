@@ -7,7 +7,8 @@
 
 
 # Problems
-- Hiện tại chỉ transfer được file .txt, P2P client cần phải nghĩ ra cách để transfer các file tầm trung như .jpg, hoặc các file video
+- Hiện tại chỉ transfer được file .txt, P2P client cần phải nghĩ ra cách để transfer các file tầm trung như .jpg, hoặc các file video (đã ok)
+- Cần phải test thử việc truyền file trên 2 máy
   
 # P2P File-Sharing Application User Manual
 
