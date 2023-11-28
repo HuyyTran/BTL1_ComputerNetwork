@@ -16,8 +16,8 @@
 This manual provides instructions on how to use the P2P file-sharing application, which consists of a server and a client component. The server manages connections and the discovery of files, while the client is used to publish, discover, and fetch files.
 
 ## Getting Started
-1. Start the server by running the `server_hao.py` script in a terminal or command prompt.
-2. Open another terminal and start the client by running the `client_git.py` script.
+1. Start the server by running the `server_real.py` script in a terminal or command prompt.
+2. Open another terminal and start the client by running the `client_real.py` script.
 3. Once both the server and the client are running, you can use the client command-line interface (CLI) to perform file-sharing operations.
 
 ## Client Commands
