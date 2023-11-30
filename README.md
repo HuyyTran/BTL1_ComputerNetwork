@@ -7,8 +7,11 @@
 
 
 # Problems
-- Hiện tại chỉ transfer được file .txt, P2P client cần phải nghĩ ra cách để transfer các file tầm trung như .jpg, hoặc các file video (đã ok)
-- Cần phải test thử việc truyền file trên 2 máy
+- Connect to the same network
+- turn off the Firewall in the server laptop
+- ip = '0.0.0.0'
+- say no to 'png' files
+- 
   
 # P2P File-Sharing Application User Manual
 
