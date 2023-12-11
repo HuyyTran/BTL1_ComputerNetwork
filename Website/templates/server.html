@@ -49,6 +49,36 @@
                             <button id="startServer" class="btn btn-success">Start Server</button>
                             <button id="shutdownServer" class="btn btn-danger">Shutdown Server</button>
                         </div>
+
+                        <!-- Ping  -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                Ping Host
+                            </div>
+                            <div class="card-body">
+                                <form id="pingForm">
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" placeholder="Enter hostname" aria-label="Hostname" id="pingHostname">
+                                        <button class="btn btn-outline-secondary" type="submit" id="pingButton">Ping</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                Discover Host Files
+                            </div>
+                            <div class="card-body">
+                                <form id="discoverForm">
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" placeholder="Enter hostname" aria-label="Hostname" id="discoverHostname">
+                                        <button class="btn btn-outline-secondary" type="submit" id="discoverButton">Discover</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
                         <div class="card mb-4">
                             <div class="card-header">
                                 <i class="fas fa-table me-1"></i>
@@ -60,6 +90,7 @@
                                 </table>
                             </div>
                         </div>
+
                         <div class="card mb-4">
                             <div class="card-header">
                                 <i class="fas fa-list me-1"></i>
