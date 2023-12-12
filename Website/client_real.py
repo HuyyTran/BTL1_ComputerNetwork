@@ -11,15 +11,15 @@ client = Blueprint('client_real', __name__)
 dictionary = "D:/dictionary.txt"
 event = threading.Event()
 #------------------------------------------------CLIENT SIDE---------------------------------------------------------------------------------#
-class ClientShell(cmd.Cmd):
+class ClientShell():
     intro = 'Welcome to the P2P client shell. Type help or ? to list commands.\n'
     prompt = '(client) '
 
-    def __init__(self):
+    def __init__(self, ip, port):
         super().__init__()
         self.lock = threading.Lock()
-        self.server_ip = 'localhost'  # Replace with actual server IP
-        self.server_port = 5000       # Replace with actual server port
+        self.server_ip = ip
+        self.server_port = port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((self.server_ip, self.server_port))
           
@@ -29,29 +29,25 @@ class ClientShell(cmd.Cmd):
         self.sock.close()
         return True  # Return True to stop the cmd loop and exit
 
-    def do_publish(self, arg):
+    def do_publish(self, lname, fname, filepath):
         "Inform the server of an existing file\n FORMAT: publish lname fname"
-        lname, fname = arg.split(' ')
-        filepath = input("Enter the path of the file: ")
         with open(dictionary, 'a') as file:
             # We have to protect this field cause this is a write-file action
             with self.lock:
                 file.write(f"<'{fname}'> <'{filepath}'>\n")
             command = f"publish '{lname}' '{fname}'"
-            self.send_command(self.sock, command)
+            return self.send_command(self.sock, command)
     
     def do_fetch(self, fname):
         "Request the information of nodes holding specific file from the server\n FORMAT: fetch filename"
         command = f"fetch '{fname}'"
         response = self.send_command(self.sock, command)
-        if (response == "1 OK"):
-            print("Your file's information has been downloading online.")
-        elif (response == "2 Error"):
-            print(f"There is no requested file '{fname}' existed in the network.")
-            return
+        if (response == "2 Error"):
+            return f"There is no requested file '{fname}' existed in the network."
+            
         elif (response == "3 Error"):
-            print(f"There is no clients who is holding your requested file '{fname}' be online. Please try again later.")
-            return
+            return f"There is no clients who is holding your requested file '{fname}' be online. Please try again later."
+        
         lines = response.split("\n")
         for line in lines:
             # Extract values within angle brackets
@@ -63,10 +59,10 @@ class ClientShell(cmd.Cmd):
             
             # Establish connection
             p2p_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            p2p_sock.connect((ip_address, 30))
+            p2p_sock.connect((ip_address, port))
 
             # Send request again
-            self.send_command2(p2p_sock, command)
+            return self.send_command2(p2p_sock, command)
 
             break
         
@@ -79,11 +75,10 @@ class ClientShell(cmd.Cmd):
 
             # Wait for the server's response
             response = socket.recv(4096).decode('utf-8')
-            print(f"Server response: ")
-            print(response)
             return response
+
         except Exception as e:
-            print(f"An error occurred: {e}")
+            return f"An error occurred: {e}"
     
     # This function is to handle p2p transfer file
     def send_command2(self, socket, command):
@@ -102,11 +97,12 @@ class ClientShell(cmd.Cmd):
                     if not data:
                         break
                     file.write(data)
-            print(f"The file '{filename}' has been downloaded to your device (path: '{filepath}').")
+            return f"The file '{filename}' has been downloaded to your device (path: '{filepath}')."
         except Exception as e:
-            print(f"An error occurred: {e}")
+            return f"An error occurred: {e}"
             
-        
+
+
 #------------------------------------------------------------------SERVER SIDE--------------------------------------------------------------#
 # This class will run parralel with the ClientShell
 # But do not print anything, just handle implicitly
@@ -184,22 +180,3 @@ def run_Server():
     port = 30  # Change to the appropriate port
     server = P2P_Server(host, port)
     server.start_server()
-    
-
-def run_ClientShell():
-    shell = ClientShell()
-    shell.cmdloop()
-
-if __name__ == '__main__':
-    # Create threads for the server and client functions
-    ClientShell_thread = threading.Thread(target=run_ClientShell)
-    Server_thread = threading.Thread(target=run_Server)
-    #threading.Thread(target=receive_heartbeat).start()
-    
-    # Start both threads
-    ClientShell_thread.start()
-    Server_thread.start()
-    
-    # Wait for both threads to finish
-    ClientShell_thread.join()
-    Server_thread.join()
