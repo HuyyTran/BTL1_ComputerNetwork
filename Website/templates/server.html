@@ -45,6 +45,7 @@
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item active">Server View</li>
                         </ol>
+                        <div id="message"></div>
                         <div class="mb-4">
                             <button id="startServer" class="btn btn-success">Start Server</button>
                             <button id="shutdownServer" class="btn btn-danger">Shutdown Server</button>
@@ -120,5 +121,66 @@
         <script src="{{ url_for('static', filename='assets/demo/chart-area-demo.js') }}"></script>
         <script src="{{ url_for('static', filename='assets/demo/chart-bar-demo.js') }}"></script>
         <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+        <script>
+            // Event listener for DOM content loaded
+            document.addEventListener('DOMContentLoaded', function() {
+              // Function to display messages
+              function displayMessage(message, isSuccess) {
+                const messageDiv = document.getElementById('message');
+                messageDiv.textContent = message;
+                messageDiv.className = isSuccess ? 'alert alert-success' : 'alert alert-danger';
+              }
+          
+              // Start server event listener
+              document.getElementById('startServer').addEventListener('click', function() {
+                // AJAX request to start server
+                fetch('/server/start', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({  host: '127.0.0.1', port: 5000})// Hardcoded values
+                })
+                .then(response => response.json())
+                .then(data => {
+                  // Process and display success message
+                  if (data.status === 'success') {
+                    displayMessage(data.message, true);
+                  } else {
+                    displayMessage(data.message, false);
+                  }
+                })
+                .catch((error) => {
+                  // Process and display error message
+                  displayMessage('Failed to start server: ' + error.message, false);
+                });
+              });
+          
+              // Shutdown server event listener
+              document.getElementById('shutdownServer').addEventListener('click', function() {
+                // AJAX request to shutdown server
+                fetch('/server/stop', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  }
+                })
+                .then(response => response.json())
+                .then(data => {
+                  // Process and display success message
+                  if (data.status === 'success') {
+                    displayMessage(data.message, true);
+                  } else {
+                    displayMessage(data.message, false);
+                  }
+                })
+                .catch((error) => {
+                  // Process and display error message
+                  displayMessage('Failed to stop server: ' + error.message, false);
+                });
+              });
+            });
+          </script>
+          
     </body>
 </html>
