@@ -45,11 +45,12 @@
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item active">Server View</li>
                         </ol>
+                        <div id="serverStatus"></div>
                         <div class="mb-4">
                             <button id="startServer" class="btn btn-success">Start Server</button>
                             <button id="shutdownServer" class="btn btn-danger">Shutdown Server</button>
                         </div>
-
+                        
                         <!-- Ping  -->
                         <div class="card mb-4">
                             <div class="card-header">
@@ -78,7 +79,7 @@
                                 </form>
                             </div>
                         </div>
-
+ 
                         <div class="card mb-4">
                             <div class="card-header">
                                 <i class="fas fa-table me-1"></i>
@@ -113,6 +114,37 @@
                 </footer>
             </div>
         </div>
+
+        <script>
+            function updateStatus(message) {
+                document.getElementById('serverStatus').textContent = message;
+            }
+            
+            document.getElementById('startServer').addEventListener('click', function() {
+                fetch('/start-server', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    updateStatus(data.message);  // Update the status message on the page
+                })
+                .catch((error) => {
+                    updateStatus('Error starting server: ' + error);  // Update the status message on the page
+                });
+            });
+            
+            document.getElementById('shutdownServer').addEventListener('click', function() {
+                fetch('/stop-server', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    updateStatus(data.message);  // Update the status message on the page
+                })
+                .catch((error) => {
+                    updateStatus('Error stopping server: ' + error);  // Update the status message on the page
+                });
+            });
+            </script>
+
+
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
@@ -120,5 +152,7 @@
         <script src="{{ url_for('static', filename='assets/demo/chart-area-demo.js') }}"></script>
         <script src="{{ url_for('static', filename='assets/demo/chart-bar-demo.js') }}"></script>
         <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+
+        
     </body>
 </html>

@@ -65,7 +65,7 @@
                         <!-- File Transfer -->
                         <div class="card mb-4">
                             <div class="card-header">
-                                File Transfer
+                                Publish File 
                             </div>
                             <div class="card-body">
                                 <form id="fileTransferForm">
@@ -73,7 +73,26 @@
                                         <label for="fileInput" class="form-label">Select file</label>
                                         <input type="file" class="form-control" id="fileInput" required>
                                     </div>
-                                    <button type="submit" class="btn btn-success">Send File</button>
+                                    <button type="submit" class="btn btn-success">Publish</button>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- Fetch -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                Fetch File 
+                            </div>
+                            <div class="card-body">
+                                <form id="fileTransferForm">
+                                    <div class="mb-3">
+                                        <label for="nameFileInput" class="form-label">Enter File's Name:</label>
+                                        <input type="text" class="form-control" id="nameFileileInput" required>
+                                        <label for="nameFolderInput" class="form-label">Choose Folder to Download:</label>
+                                        <input type="folder" class="form-control" id="nameFolderInput" required>
+                                        <label for="saveName" class="form-label">Save file as:</label>
+                                        <input type="text" class="form-control" id="saveName" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-success">Fetch</button>
                                 </form>
                             </div>
                         </div>
@@ -99,6 +118,44 @@
                 </footer>
             </div>
         </div>
+
+        <script>
+            document.getElementById('connectionForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                var serverIp = document.getElementById('serverIp').value;
+                var serverPort = document.getElementById('serverPort').value;
+                
+                // Send POST request to connect endpoint
+                fetch('/connect', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        'serverIp': serverIp,
+                        'serverPort': serverPort
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                })
+                .catch((error) => {
+                    alert('Error connecting: ' + error);
+                });
+            });
+            
+            document.getElementById('disconnect').addEventListener('click', function() {
+                // Send POST request to disconnect endpoint
+                fetch('/disconnect', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                })
+                .catch((error) => {
+                    alert('Error disconnecting: ' + error);
+                });
+            });
+        </script>
+            
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
