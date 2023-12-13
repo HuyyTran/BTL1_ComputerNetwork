@@ -59,6 +59,7 @@ class ServerCmd(cmd.Cmd):
                 host, port = client_addr
                 command = data.strip().split(' ')
                 flag = 0
+                
                 # Handle 'publish' command from client
                 # Remind syntax: publish lname fname
                 if (command[0] == "publish"):
@@ -74,8 +75,7 @@ class ServerCmd(cmd.Cmd):
                         for line in file:
                             values = [value.strip(" <>") for value in line.split()]
                             ip = values[0].strip("'")
-                            port = 30
-                            hostname = ip + "," + str(port)
+                            port = 50000
                             fname = " ".join(values[2:]).strip("'")
                             if (fname == command[1].strip("'")):
                                 if (scan_server_on_machine(ip, port)):                               
@@ -128,7 +128,7 @@ class ServerCmd(cmd.Cmd):
 
     def load_shared_files_dictionary(self):
         # Load and parse the contents of dictionary_s.txt
-        with open('D:/dictionary_s.txt', 'r') as file:
+        with open(dictionary, 'r') as file:
             contents = file.read()
         return self.parse_dictionary_s(contents)
     
@@ -231,7 +231,7 @@ def scan_server_on_machine(ip, port):
     return False
 
 if __name__ == '__main__':
-    host = 'localhost'  # Change to the appropriate interface
+    host = '0.0.0.0'  # Change to the appropriate interface
     port = 5000  # Change to the appropriate port
     server_cmd = ServerCmd(host, port)
     server_cmd.start_server()
