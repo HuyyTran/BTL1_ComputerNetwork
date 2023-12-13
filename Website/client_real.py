@@ -115,7 +115,6 @@ class P2P_Server():
         self.server_socket.bind((self.server_host, self.server_port))
         self.server_socket.listen()
         threading.Thread(target=self.listen_to_clients, daemon=True).start()
-        return self.server_port
 
     def listen_to_clients(self):
         while True:
