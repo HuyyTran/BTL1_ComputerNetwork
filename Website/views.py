@@ -1,6 +1,11 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, redirect, url_for
+from . import client_real
+import threading
 
 views = Blueprint('views', __name__)
+
+client = None
+p2p_server = None
 
 @views.route('/')
 def home(): 
@@ -17,16 +22,15 @@ def client_view():
 @views.route('/connect_server', methods=['GET', 'POST'])
 def connect():
     global client
+    global p2p_server
     if request.method == "POST":
         try:
             ip = request.form['serverIp']
             port = request.form['serverPort']
             client = client_real.ClientShell(ip, int(port))
+            p2p_server = client_real.P2P_Server('127.0.0.1', 30).start_server()
             
-            # Create threads for the P2P client functions
-            Server_thread = threading.Thread(target=client_real.run_Server)
-            # Start threads
-            Server_thread.start()
+
             if client:
                 return render_template('client.html', message=f"Connect Successfully for {ip} and {port} server!")
         except Exception as e:
@@ -48,7 +52,8 @@ def publish():
             
         except Exception as e:
             response = f"Error: {e}"
-            return render_template('client.html', message=response)
+
+        return render_template('client.html', message=response)
     else:
         pass
 
@@ -56,8 +61,9 @@ def publish():
 @views.route('/fetch', methods=['POST'])
 def fetch():
     fname = request.form['fname']
-
+    directory = request.form['directory']
+    name = request.form['name']
+    
     # Use client_shell to handle fetching logic
-    response = client.do_fetch(fname)
-
+    response = client.do_fetch(fname, directory, name)
     return response
