@@ -1,6 +1,3 @@
-from ast import Pass
-import cmd
-from ipaddress import ip_address
 import threading
 import socket
 
@@ -38,7 +35,7 @@ class ClientShell():
             command = f"publish '{lname}' '{fname}'"
             return self.send_command(self.sock, command)
     
-    def do_fetch(self, fname):
+    def do_fetch(self, fname, directory, name):
         "Request the information of nodes holding specific file from the server\n FORMAT: fetch filename"
         command = f"fetch '{fname}'"
         response = self.send_command(self.sock, command)
@@ -62,9 +59,8 @@ class ClientShell():
             p2p_sock.connect((ip_address, port))
 
             # Send request again
-            return self.send_command2(p2p_sock, command)
+            return self.send_command2(p2p_sock, directory, name, command)
 
-            break
         
     # This function return the response from the server
     def send_command(self, socket, command):
@@ -81,23 +77,21 @@ class ClientShell():
             return f"An error occurred: {e}"
     
     # This function is to handle p2p transfer file
-    def send_command2(self, socket, command):
+    def send_command2(self, socket, directory, name, command):
         try:
             # Send command
             message = command.encode('utf-8')
             socket.sendall(message)    
      
             # Receive file
-            path = input("Enter the directory for your new downloaded file: ")
-            filename = input("Enter the name of your new downloaded file(Don't forget to add the type of your file): ")
-            filepath = path + filename
+            filepath = directory + name
             with open(filepath, 'wb') as file:
                 while True:
                     data = socket.recv(256)
                     if not data:
                         break
                     file.write(data)
-            return f"The file '{filename}' has been downloaded to your device (path: '{filepath}')."
+            return f"The file '{name}' has been downloaded to your device (path: '{filepath}')."
         except Exception as e:
             return f"An error occurred: {e}"
             
@@ -121,6 +115,7 @@ class P2P_Server():
         self.server_socket.bind((self.server_host, self.server_port))
         self.server_socket.listen()
         threading.Thread(target=self.listen_to_clients, daemon=True).start()
+        return "true"
 
     def listen_to_clients(self):
         while True:
@@ -172,11 +167,3 @@ class P2P_Server():
                 if (current_fname == fname):
                     self.send_file(socket, filepath)
                     break
-    
-
-#-----------------------------------------------------------------EXECUTE CODE------------------------------------------------------------------------------#
-def run_Server():
-    host = 'localhost'  # Change to the appropriate interface
-    port = 30  # Change to the appropriate port
-    server = P2P_Server(host, port)
-    server.start_server()
