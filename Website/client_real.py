@@ -20,7 +20,7 @@ class ClientShell():
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((self.server_ip, self.server_port))
           
-    def do_exit(self, arg):
+    def do_exit(self):
         "Exit the client shell"
         print("Exiting client...")
         self.sock.close()
@@ -52,7 +52,7 @@ class ClientShell():
             
             # Get ip_addr and port of the target node
             ip_address = (values[0])
-            port = (int)(values[1])
+            port = 50000
             
             # Establish connection
             p2p_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -115,7 +115,7 @@ class P2P_Server():
         self.server_socket.bind((self.server_host, self.server_port))
         self.server_socket.listen()
         threading.Thread(target=self.listen_to_clients, daemon=True).start()
-        return "true"
+        return self.server_port
 
     def listen_to_clients(self):
         while True:
