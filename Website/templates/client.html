@@ -48,14 +48,14 @@
                         <!-- Connection to Server -->
                         <div class="card mb-4">
                             <div class="card-body">
-                                <form id="connectionForm">
+                                <form id="connectionForm", action="/connect_server", method="post">
                                     <div class="mb-3">
                                         <label for="serverIp" class="form-label">Server IP</label>
-                                        <input type="text" class="form-control" id="serverIp" required>
+                                        <input type="text" class="form-control" id="serverIp" name="serverIp" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="serverPort" class="form-label">Server Port</label>
-                                        <input type="number" class="form-control" id="serverPort" required>
+                                        <input type="number" class="form-control" id="serverPort" name="serverPort" required>
                                     </div>
                                     <button type="submit" class="btn btn-primary">Connect</button>
                                     <button type="button" class="btn btn-secondary" id="disconnect">Disconnect</button>
@@ -65,15 +65,46 @@
                         <!-- File Transfer -->
                         <div class="card mb-4">
                             <div class="card-header">
-                                File Transfer
+                                Publish File
                             </div>
                             <div class="card-body">
-                                <form id="fileTransferForm">
+                                <form id="fileTransferForm", action="/publish", method="post">
                                     <div class="mb-3">
-                                        <label for="fileInput" class="form-label">Select file</label>
-                                        <input type="file" class="form-control" id="fileInput" required>
+                                        <label for="lname" class="form-label">lname</label>
+                                        <input type="text" class="form-control" id="lname", name="lname" required>
                                     </div>
-                                    <button type="submit" class="btn btn-success">Send File</button>
+                                    <div class="mb-3">
+                                        <label for="fname" class="form-label">fname</label>
+                                        <input type="text" class="form-control" id="fname" name="fname" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="filepath" class="form-label">File Path</label>
+                                        <input type="text" class="form-control" id="filepath" name="filepath" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-success">Publish File</button>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- File Receive -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                Fetch File
+                            </div>
+                            <div class="card-body">
+                                <form id="fileTransferForm", action="/fetch", method="post">
+                                    <div class="mb-3">
+                                        <label for="fname" class="form-label">fname</label>
+                                        <input type="text" class="form-control" id="fname", name="fname" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="directory" class="form-label">Choose Folder</label>
+                                        <input type="text" class="form-control" id="directory" name="directory" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Save as</label>
+                                        <input type="text" class="form-control" id="name" name="name" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-success">Fetch File</button>
                                 </form>
                             </div>
                         </div>
@@ -85,6 +116,7 @@
                             <div class="card-body">
                                 <div class="activity-log" style="height:300px;overflow-y:scroll;">
                                     <!-- Log content updated via JavaScript -->
+                                    <text> {{message}} </text>
                                 </div>
                             </div>
                         </div>
