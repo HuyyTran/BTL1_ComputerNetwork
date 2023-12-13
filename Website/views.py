@@ -1,6 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request
 from . import client_real
-import threading
 
 views = Blueprint('views', __name__)
 
@@ -28,16 +27,23 @@ def connect():
             ip = request.form['serverIp']
             port = request.form['serverPort']
             client = client_real.ClientShell(ip, int(port))
-            p2p_server = client_real.P2P_Server('127.0.0.1', 30).start_server()
-            
+            # This function return the port of p2p server
+            p2p_server = client_real.P2P_Server('0.0.0.0', 50000).start_server()     
 
             if client:
-                return render_template('client.html', message=f"Connect Successfully for {ip} and {port} server!")
+                return render_template('client.html', message=f"Connect Successfully for IP Address: {ip} and Port: {port} server!")
         except Exception as e:
             return render_template('client.html', message=f"Error: {e}")
     else:
         return render_template('client.html', message='')
 
+@views.route('/disconnect', methods=['POST'])
+def handle_disconnect():
+    # Call your Python function here
+    client.do_exit()
+
+    # Return a response, could be JSON or just a simple text
+    return render_template('client.html', message="You have disconnected from the server.")
 
 @views.route('/publish', methods=['POST'])
 def publish():
