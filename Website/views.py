@@ -72,4 +72,4 @@ def fetch():
     
     # Use client_shell to handle fetching logic
     response = client.do_fetch(fname, directory, name)
-    return response
+    return render_template('client.html', message=response)
