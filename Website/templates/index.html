@@ -1,103 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="" />
-        <meta name="author" content="" />
-        <title>Introduction</title>
-        <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
-        <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
-        <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    </head>
-    <body class="sb-nav-fixed">
-        <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-            <!-- Navbar Brand-->
-            <a class="navbar-brand ps-3" href="index.html">File Sharing Website</a>
-            <!-- Sidebar Toggle-->
-            <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
-        </nav>
-        <div id="layoutSidenav">
-            <div id="layoutSidenav_nav">
-                <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
-                    <div class="sb-sidenav-menu">
-                        <div class="nav">
-                            <div class="sb-sidenav-menu-heading">Table of content</div>
-                            <a class="nav-link" href="{{ url_for('views.home') }}">
-                                <div class="sb-nav-link-icon"></div>
-                                Introduction 
-                            </a>
-                            <a class="nav-link" href="{{ url_for('views.server_view') }}">
-                                <div class="sb-nav-link-icon"></div>
-                                Server View
-                            </a>
-                            <a class="nav-link" href="{{ url_for('views.client_view') }}">
-                                <div class="sb-nav-link-icon"></div>
-                                Client View
-                            </a>              
-                        </div>
-                    </div>     
-                </nav>
-            </div>
-            
-            <div id="layoutSidenav_content">
-                <main>
-                    <div class="container-fluid px-4">
-                        <h1 class="mt-4">Introduction</h1>
-                        <ol class="breadcrumb mb-4">
-                            <li class="breadcrumb-item active">Introduction</li>
-                        </ol>
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                The content of introduction will be here. 
-                            </div>
-                        </div>
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">Server Functionalities</h5>
-                                <p>The server script provides the following functionalities:</p>
-                                <ul>
-                                    <li><strong>Start Server:</strong> Initializes and starts the server on a specified host and port.</li>
-                                    <li><strong>Listen to Clients:</strong> Continuously listens for new client connections and handles them in separate threads.</li>
-                                    <li><strong>Handle Client:</strong> Manages communication with connected clients.</li>
-                                    <li><strong>Exit:</strong> Shuts down the server and closes all client connections.</li>
-                                    <li><strong>List Clients:</strong> Lists all currently connected clients.</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">Client Functionalities</h5>
-                                <p>The client script is designed to interact with the server and provides the following functionalities:</p>
-                                <ul>
-                                    <li><strong>Connect to Server:</strong> Establishes a connection to the server using a specified IP address and port.</li>
-                                    <li><strong>Send Files:</strong> Allows sending files to the server or other connected clients.</li>
-                                    <li><strong>Receive Files:</strong> Can receive files from the server or other clients.</li>
-                                    <li><strong>Exit:</strong> Closes the client's connection to the server and exits the application.</li>
-                                    <li><strong>Command Input:</strong> If the system has a command shell, this enables sending commands directly to the server and viewing responses.</li>
-                                </ul>
-                            </div>
-                        </div>
-                        
-                        
-                    </div>
-                </main>
-                <footer class="py-4 bg-light mt-auto">
-                    <div class="container-fluid px-4">
-                        <div class="d-flex align-items-center justify-content-between small">
-                            <div class="text-muted">Copyright &copy; File Sharing Website - Computer Network Project 2023</div>
-                        </div>
-                    </div>
-                </footer>
-            </div>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="" />
+  <meta name="author" content="" />
+  <title>Introduction</title>
+  <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
+  <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+</head>
+
+<body class="sb-nav-fixed">
+  <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+    <!-- Navbar Brand-->
+    <a class="navbar-brand ps-3" href="index.html">File Sharing Website</a>
+    <!-- Sidebar Toggle-->
+    <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
+  </nav>
+  <div id="layoutSidenav">
+    <div id="layoutSidenav_nav">
+      <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+        <div class="sb-sidenav-menu">
+          <div class="nav">
+            <div class="sb-sidenav-menu-heading">Table of content</div>
+            <a class="nav-link" href="{{ url_for('views.home') }}">
+              <div class="sb-nav-link-icon"></div>
+              Introduction
+            </a>
+
+            <a class="nav-link" href="{{ url_for('views.client_view') }}">
+              <div class="sb-nav-link-icon"></div>
+              Client View
+            </a>
+          </div>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
-        <script src="{{ url_for('static', filename='js/datatables-simple-demo.js') }}"></script>
-        <script src="{{ url_for('static', filename='assets/demo/chart-area-demo.js') }}"></script>
-        <script src="{{ url_for('static', filename='assets/demo/chart-bar-demo.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
-    </body>
+      </nav>
+    </div>
+
+    <div id="layoutSidenav_content">
+      <main>
+        <div class="container-fluid px-4">
+          <h1 class="mt-4">Introduction</h1>
+          <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item active">Introduction</li>
+          </ol>
+          <div class="card mb-4">
+            <div class="card-body">
+              Welcome to the server side of our P2P file-sharing application. This component functions behind the scenes and is operated via a command-line interface on the terminal, reflecting our commitment to a peer-to-peer architecture. It orchestrates network connections and file directory services without a graphical interface, allowing users to connect, share, and discover files directly. 
+              <br>
+              <br>
+              While the client side is visible through our web interface for ease of access, the server remains the unseen backbone, efficiently managing peer connections and ensuring the integrity of the network.
+            </div>
+          </div>
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="card-title">Server Functionalities</h5>
+              <p>The server script provides the following functionalities:</p>
+              <ul>
+                <li><strong>Start Server:</strong> Initializes and starts the server on a specified host and port.</li>
+                <li><strong>Listen to Clients:</strong> Continuously listens for new client connections and handles them in separate threads.</li>
+                <li><strong>Handle Client:</strong> Manages communication with connected clients.</li>
+                <li><strong>Exit:</strong> Shuts down the server and closes all client connections.</li>
+                <li><strong>List Clients:</strong> Lists all currently connected clients.</li>
+                <li><strong>Ping:</strong> A diagnostic tool to confirm the reachability of a client within the network.</li>
+                <li><strong>Discover:</strong> Allows clients to query the network, revealing other peers and the files available for sharing.</li>
+
+              </ul>
+            </div>
+          </div>
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="card-title">Client Functionalities</h5>
+              <p>The client script is designed to interact with the server and provides the following functionalities:</p>
+              <ul>
+                <li><strong>Connect to Server:</strong> Establishes a connection to the server using a specified IP address and port.</li>
+                <li><strong>Send Files:</strong> Allows sending files to the server or other connected clients.</li>
+                <li><strong>Receive Files:</strong> Can receive files from the server or other clients.</li>
+                <li><strong>Exit:</strong> Closes the client's connection to the server and exits the application.</li>
+                <li><strong>Command Input:</strong> If the system has a command shell, this enables sending commands directly to the server and viewing responses.</li>
+              </ul>
+            </div>
+          </div>
+
+
+        </div>
+      </main>
+      <footer class="py-4 bg-light mt-auto">
+        <div class="container-fluid px-4">
+          <div class="d-flex align-items-center justify-content-between small">
+            <div class="text-muted">Copyright &copy; File Sharing Website - Computer Network Project 2023</div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static', filename='js/datatables-simple-demo.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/demo/chart-area-demo.js') }}"></script>
+  <script src="{{ url_for('static', filename='assets/demo/chart-bar-demo.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+
 </html>
