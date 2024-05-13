@@ -1,5 +1,5 @@
 # P2P File-Sharing Application 
-## Overview
+## About the project
 This manual provides instructions on how to use the P2P file-sharing application, which consists of a server and a client component. The server manages connections and the discovery of files, while the client is used to publish, discover, and fetch files.
 ## Table of Contents
 - [Installation](#installation)
